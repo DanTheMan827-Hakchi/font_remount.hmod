@@ -1,0 +1,3 @@
+rm "$rootfs/etc/preinit.d/p8025_fontfix"
+rm -rf "$rootfs/usr/fonts"
+restore "$gamepath/title.fnt"
