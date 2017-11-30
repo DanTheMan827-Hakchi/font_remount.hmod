@@ -1,3 +1,9 @@
+fontFix_bind(){
+  if [ -f "$2" ]; then
+    mount_bind "$1" "$2" || return 1
+  fi
+  return 0
+}
 fontFix(){
   if [ "$cfg_fontfix_enabled" == "y" ]; then
     local titleFontPath="$rootfs/usr/share/fonts/title.fnt"
@@ -8,10 +14,12 @@ fontFix(){
     local lFontPath=""
     
     # Title Font
+    [ -f "$squashfs$gamepath/title.fnt" ] && titleFontPath="$squashfs$gamepath/title.fnt"
     [ -f "$installpath/fonts/title.fnt" ] && titleFontPath="$installpath/fonts/title.fnt"
     [ -f "$mountpoint/media/$modname/fonts/title.fnt" ] && titleFontPath="$mountpoint/media/$modname/fonts/title.fnt"
     
     # Copyright Font
+    [ -f "$squashfs$gamepath/copyright.fnt" ] && copyrightFontPath="$squashfs$gamepath/copyright.fnt"
     [ -f "$installpath/fonts/copyright.fnt" ] && copyrightFontPath="$installpath/fonts/copyright.fnt"
     [ -f "$mountpoint/media/$modname/fonts/copyright.fnt" ] && copyrightFontPath="$mountpoint/media/$modname/fonts/copyright.fnt"
     
@@ -33,111 +41,75 @@ fontFix(){
     
     case "$sftype" in
       nes)
-        local currentTitleFontHash="$(md5sum "$titleFontPath" | awk '{ print $1 }')"
-        if [ -z "$cfg_fontfix_titlehash" ] || [ "$cfg_fontfix_titlehash" != "$currentTitleFontHash" ]; then
-          [ -d "$rootfs$gamepath" ] && find "$rootfs$gamepath" -name "title.fnt" -exec rm {} \;
-          cfg_fontfix_titlehash="$currentTitleFontHash"
-        fi
-        
-        local currentCopyrightFontHash="$(md5sum "$copyrightFontPath" | awk '{ print $1 }')"
-        if [ -z "$cfg_fontfix_copyrighthash" ] || [ "$cfg_fontfix_copyrighthash" != "$currentCopyrightFontHash" ]; then
-          [ -d "$rootfs$gamepath" ] && find "$rootfs$gamepath" -name "title.fnt" -exec rm {} \;
-          cfg_fontfix_copyrighthash="$currentCopyrightFontHash"
-        fi
         
         # Title Font
-        [ -d "$rootfs$gamepath" ] && copy "$titleFontPath" "$rootfs$gamepath"
+        [ -d "$rootfs$gamepath" ] && rsync -ac "$titleFontPath" "$rootfs$gamepath/"
         
         # Copyright Font
-        [ -d "$rootfs$gamepath" ] && copy "$copyrightFontPath" "$rootfs$gamepath"
+        [ -d "$rootfs$gamepath" ] && rsync -ac "$copyrightFontPath" "$rootfs$gamepath/"
         
         # Debug Font
-        [ -f "$debugFontPath" ] && [ -f "$mountpoint/usr/share/clover-ui/resources/fonts/debug.fnt" ] && \
-          mount_bind "$debugFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/debug.fnt"
+        [ -f "$debugFontPath" ] && fontFix_bind "$debugFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/debug.fnt"
         
         # Small Font
         if [ -f "$sFontPath" ]; then
-          [ -f "$mountpoint/usr/share/clover-ui/resources/fonts/nes/s.fnt" ] && \
-            mount_bind "$sFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/nes/s.fnt"
-          [ -f "$mountpoint/usr/share/clover-ui/resources/fonts/hvc/s.fnt" ] && \
-            mount_bind "$sFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/hvc/s.fnt"
+          fontFix_bind "$sFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/nes/s.fnt"
+          fontFix_bind "$sFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/hvc/s.fnt"
         fi
         
         # Medium Font
         if [ -f "$mFontPath" ]; then
-          [ -f "$mountpoint/usr/share/clover-ui/resources/fonts/nes/m.fnt" ] && \
-            mount_bind "$mFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/nes/m.fnt"
-          [ -f "$mountpoint/usr/share/clover-ui/resources/fonts/hvc/m.fnt" ] && \
-            mount_bind "$mFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/hvc/m.fnt"
+          fontFix_bind "$mFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/nes/m.fnt"
+          fontFix_bind "$mFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/hvc/m.fnt"
         fi
         
         # Large Font
         if [ -f "$lFontPath" ]; then
-          [ -f "$mountpoint/usr/share/clover-ui/resources/fonts/nes/l.fnt" ] && \
-            mount_bind "$lFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/nes/l.fnt"
-          [ -f "$mountpoint/usr/share/clover-ui/resources/fonts/hvc/l.fnt" ] && \
-            mount_bind "$lFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/hvc/l.fnt"
+          fontFix_bind "$lFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/nes/l.fnt"
+          fontFix_bind "$lFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/hvc/l.fnt"
         fi
         ;;
       snes)
         # Title Font
         if [ -f "$titleFontPath" ]; then
-          [ -f "$mountpoint/usr/share/ui/snes-usa/resources/fonts/title.font" ] && \
-            mount_bind "$titleFontPath" "$mountpoint/usr/share/ui/snes-usa/resources/fonts/title.font"
-          [ -f "$mountpoint/usr/share/ui/snes-eur/resources/fonts/title.font" ] && \
-            mount_bind "$titleFontPath" "$mountpoint/usr/share/ui/snes-eur/resources/fonts/title.font"
-          [ -f "$mountpoint/usr/share/ui/shvc/resources/fonts/title.font" ] && \
-            mount_bind "$titleFontPath" "$mountpoint/usr/share/ui/shvc/resources/fonts/title.font"
+          fontFix_bind "$titleFontPath" "$mountpoint/usr/share/ui/snes-usa/resources/fonts/title.font"
+          fontFix_bind "$titleFontPath" "$mountpoint/usr/share/ui/snes-eur/resources/fonts/title.font"
+          fontFix_bind "$titleFontPath" "$mountpoint/usr/share/ui/shvc/resources/fonts/title.font"
         fi
         
         # Copyright Font
         if [ -f "$copyrightFontPath" ]; then
-          [ -f "$mountpoint/usr/share/ui/snes-usa/resources/fonts/copyright.fnt" ] && \
-            mount_bind "$copyrightFontPath" "$mountpoint/usr/share/ui/snes-usa/resources/fonts/copyright.fnt"
-          [ -f "$mountpoint/usr/share/ui/snes-eur/resources/fonts/copyright.fnt" ] && \
-            mount_bind "$copyrightFontPath" "$mountpoint/usr/share/ui/snes-eur/resources/fonts/copyright.fnt"
-          [ -f "$mountpoint/usr/share/ui/shvc/resources/fonts/copyright.fnt" ] && \
-            mount_bind "$copyrightFontPath" "$mountpoint/usr/share/ui/shvc/resources/fonts/copyright.fnt"
+          fontFix_bind "$copyrightFontPath" "$mountpoint/usr/share/ui/snes-usa/resources/fonts/copyright.fnt"
+          fontFix_bind "$copyrightFontPath" "$mountpoint/usr/share/ui/snes-eur/resources/fonts/copyright.fnt"
+          fontFix_bind "$copyrightFontPath" "$mountpoint/usr/share/ui/shvc/resources/fonts/copyright.fnt"
         fi
         
         # Debug Font
         if [ -f "$debugFontPath" ]; then
-          [ -f "$mountpoint/usr/share/ui/snes-usa/resources/fonts/debug.font" ] && \
-            mount_bind "$debugFontPath" "$mountpoint/usr/share/ui/snes-usa/resources/fonts/debug.font"
-          [ -f "$mountpoint/usr/share/ui/snes-eur/resources/fonts/debug.font" ] && \
-            mount_bind "$debugFontPath" "$mountpoint/usr/share/ui/snes-eur/resources/fonts/debug.font"
-          [ -f "$mountpoint/usr/share/ui/shvc/resources/fonts/debug.font" ] && \
-            mount_bind "$debugFontPath" "$mountpoint/usr/share/ui/shvc/resources/fonts/debug.font"
+          fontFix_bind "$debugFontPath" "$mountpoint/usr/share/ui/snes-usa/resources/fonts/debug.font"
+          fontFix_bind "$debugFontPath" "$mountpoint/usr/share/ui/snes-eur/resources/fonts/debug.font"
+          fontFix_bind "$debugFontPath" "$mountpoint/usr/share/ui/shvc/resources/fonts/debug.font"
         fi
         
         # Small Font
         if [ -f "$sFontPath" ]; then
-          [ -f "$mountpoint/usr/share/ui/snes-usa/resources/fonts/s.font" ] && \
-            mount_bind "$sFontPath" "$mountpoint/usr/share/ui/snes-usa/resources/fonts/s.font"
-          [ -f "$mountpoint/usr/share/ui/snes-eur/resources/fonts/s.font" ] && \
-            mount_bind "$sFontPath" "$mountpoint/usr/share/ui/snes-eur/resources/fonts/s.font"
-          [ -f "$mountpoint/usr/share/ui/shvc/resources/fonts/s.fnt" ] && \
-            mount_bind "$sFontPath" "$mountpoint/usr/share/ui/shvc/resources/fonts/s.fnt"
+          fontFix_bind "$sFontPath" "$mountpoint/usr/share/ui/snes-usa/resources/fonts/s.font"
+          fontFix_bind "$sFontPath" "$mountpoint/usr/share/ui/snes-eur/resources/fonts/s.font"
+          fontFix_bind "$sFontPath" "$mountpoint/usr/share/ui/shvc/resources/fonts/s.fnt"
         fi
         
         # Medium Font
         if [ -f "$mFontPath" ]; then
-          [ -f "$mountpoint/usr/share/ui/snes-usa/resources/fonts/m.font" ] && \
-            mount_bind "$mFontPath" "$mountpoint/usr/share/ui/snes-usa/resources/fonts/m.font"
-          [ -f "$mountpoint/usr/share/ui/snes-eur/resources/fonts/m.font" ] && \
-            mount_bind "$mFontPath" "$mountpoint/usr/share/ui/snes-eur/resources/fonts/m.font"
-          [ -f "$mountpoint/usr/share/ui/shvc/resources/fonts/m.fnt" ] && \
-            mount_bind "$mFontPath" "$mountpoint/usr/share/ui/shvc/resources/fonts/m.fnt"
+          fontFix_bind "$mFontPath" "$mountpoint/usr/share/ui/snes-usa/resources/fonts/m.font"
+          fontFix_bind "$mFontPath" "$mountpoint/usr/share/ui/snes-eur/resources/fonts/m.font"
+          fontFix_bind "$mFontPath" "$mountpoint/usr/share/ui/shvc/resources/fonts/m.fnt"
         fi
         
         # Large Font
         if [ -f "$lFontPath" ]; then
-          [ -f "$mountpoint/usr/share/ui/snes-usa/resources/fonts/l.font" ] && \
-            mount_bind "$lFontPath" "$mountpoint/usr/share/ui/snes-usa/resources/fonts/l.font"
-          [ -f "$mountpoint/usr/share/ui/snes-eur/resources/fonts/l.font" ] && \
-            mount_bind "$lFontPath" "$mountpoint/usr/share/ui/snes-eur/resources/fonts/l.font"
-          [ -f "$mountpoint/usr/share/ui/shvc/resources/fonts/l.fnt" ] && \
-            mount_bind "$lFontPath" "$mountpoint/usr/share/ui/shvc/resources/fonts/l.fnt"
+          fontFix_bind "$lFontPath" "$mountpoint/usr/share/ui/snes-usa/resources/fonts/l.font"
+          fontFix_bind "$lFontPath" "$mountpoint/usr/share/ui/snes-eur/resources/fonts/l.font"
+          fontFix_bind "$lFontPath" "$mountpoint/usr/share/ui/shvc/resources/fonts/l.fnt"
         fi
         ;;
     esac
