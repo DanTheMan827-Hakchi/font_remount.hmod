@@ -41,6 +41,17 @@ fontFix(){
     
     case "$sftype" in
       nes)
+        local currentTitleFontHash="$(md5sum "$titleFontPath" | awk '{ print $1 }')"
+        if [ -z "$cfg_fontfix_titlehash" ] || [ "$cfg_fontfix_titlehash" != "$currentTitleFontHash" ]; then
+          [ -d "$rootfs$gamepath" ] && find "$rootfs$gamepath" -name "title.fnt" -exec rm {} \;
+          cfg_fontfix_titlehash="$currentTitleFontHash"
+        fi
+        
+        local currentCopyrightFontHash="$(md5sum "$copyrightFontPath" | awk '{ print $1 }')"
+        if [ -z "$cfg_fontfix_copyrighthash" ] || [ "$cfg_fontfix_copyrighthash" != "$currentCopyrightFontHash" ]; then
+          [ -d "$rootfs$gamepath" ] && find "$rootfs$gamepath" -name "title.fnt" -exec rm {} \;
+          cfg_fontfix_copyrighthash="$currentCopyrightFontHash"
+        fi
         
         # Title Font
         [ -d "$rootfs$gamepath" ] && rsync -ac "$titleFontPath" "$rootfs$gamepath/"
