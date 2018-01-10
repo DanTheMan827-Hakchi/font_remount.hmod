@@ -61,11 +61,7 @@ fontFix(){
 
   case "$sftype" in
     nes)
-      # Title Font
-      [ -d "$rootfs$gamepath" ] && copy "$titleFontPath" "$rootfs$gamepath/"
-
-      # Copyright Font
-      [ -d "$rootfs$gamepath" ] && copy "$copyrightFontPath" "$rootfs$gamepath/"
+      repair_fonts "$rootfs$gamepath"
 
       # Debug Font
       [ -f "$debugFontPath" ] && fontFix_bind "$debugFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/debug.fnt"
@@ -136,8 +132,18 @@ fontFix(){
 
 repair_fonts(){
   if [ "$sftype" == "nes" ]; then
+    local titleFontPath="$(fontFix_getPath "title")"
+    local copyrightFontPath="$(fontFix_getPath "copyright")"
+    
+    titleFontPath="${titleFontPath#$mountpoint}"
+    copyrightFontPath="${copyrightFontPath#$mountpoint}"
+    
     mkdir -p "$1" || return 1
-    copy "$(fontFix_getPath "title")" "$1/"
-    copy "$(fontFix_getPath "copyright")" "$1/"
+    
+    [ -L "$1/title.fnt" ] && rm "$1/title.fnt"
+    [ -L "$1/copyright.fnt" ] && rm "$1/copyright.fnt"
+    
+    ln -s "$titleFontPath" "$1/title.fnt" || copy "$mountpoint$titleFontPath" "$1/"
+    ln -s "$copyrightFontPath" "$1/copyright.fnt" || copy "$mountpoint$copyrightFontPath" "$1/"
   fi
 }
