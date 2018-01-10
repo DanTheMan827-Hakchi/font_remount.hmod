@@ -4,40 +4,61 @@ fontFix_bind(){
   fi
   return 0
 }
+
+fontFix_getPath(){
+  local fontPath=""
+  
+  case "$1" in
+    title) # Title Font
+      [ -f "$squashfs$gamepath/title.fnt" ] && fontPath="$squashfs$gamepath/title.fnt"
+      [ -f "$rootfs/usr/share/fonts/title.fnt" ] && fontPath="$rootfs/usr/share/fonts/title.fnt"
+      [ -f "$installpath/fonts/title.fnt" ] && fontPath="$installpath/fonts/title.fnt"
+      [ -f "$mountpoint/media/$modname/fonts/title.fnt" ] && fontPath="$mountpoint/media/$modname/fonts/title.fnt"
+      ;;
+
+    copyright) # Copyright Font
+      [ -f "$squashfs$gamepath/copyright.fnt" ] && fontPath="$squashfs$gamepath/copyright.fnt"
+      [ -f "$rootfs/usr/share/fonts/copyright.fnt" ] && fontPath="$rootfs/usr/share/fonts/copyright.fnt"
+      [ -f "$installpath/fonts/copyright.fnt" ] && fontPath="$installpath/fonts/copyright.fnt"
+      [ -f "$mountpoint/media/$modname/fonts/copyright.fnt" ] && fontPath="$mountpoint/media/$modname/fonts/copyright.fnt"
+      ;;
+
+    debug) # Debug Font
+      [ -f "$rootfs/usr/share/fonts/debug.fnt" ] && fontPath="$rootfs/usr/share/fonts/debug.fnt"
+      [ -f "$installpath/fonts/debug.fnt" ] && fontPath="$installpath/fonts/debug.fnt"
+      [ -f "$mountpoint/media/$modname/fonts/debug.fnt" ] && fontPath="$mountpoint/media/$modname/fonts/debug.fnt"
+      ;;
+
+    small) # Small Font
+      [ -f "$rootfs/usr/share/fonts/small.fnt" ] && fontPath="$rootfs/usr/share/fonts/small.fnt"
+      [ -f "$installpath/fonts/small.fnt" ] && fontPath="$installpath/fonts/small.fnt"
+      [ -f "$mountpoint/media/$modname/fonts/small.fnt" ] && fontPath="$mountpoint/media/$modname/fonts/small.fnt"
+      ;;
+
+    medium) # Medium Font
+      [ -f "$rootfs/usr/share/fonts/medium.fnt" ] && fontPath="$rootfs/usr/share/fonts/medium.fnt"
+      [ -f "$installpath/fonts/medium.fnt" ] && fontPath="$installpath/fonts/medium.fnt"
+      [ -f "$mountpoint/media/$modname/fonts/medium.fnt" ] && fontPath="$mountpoint/media/$modname/fonts/medium.fnt"
+      ;;
+
+    large) # Large Font
+      [ -f "$rootfs/usr/share/fonts/large.fnt" ] && fontPath="$rootfs/usr/share/fonts/large.fnt"
+      [ -f "$installpath/fonts/large.fnt" ] && fontPath="$installpath/fonts/large.fnt"
+      [ -f "$mountpoint/media/$modname/fonts/large.fnt" ] && fontPath="$mountpoint/media/$modname/fonts/large.fnt"
+      ;;
+  esac
+  
+  echo "$fontPath"
+}
+
 fontFix(){
   if [ "$cfg_fontfix_enabled" == "y" ]; then
-    local titleFontPath="$rootfs/usr/share/fonts/title.fnt"
-    local copyrightFontPath="$rootfs/usr/share/fonts/copyright.fnt"
-    local debugFontPath=""
-    local sFontPath=""
-    local mFontPath=""
-    local lFontPath=""
-    
-    # Title Font
-    [ -f "$squashfs$gamepath/title.fnt" ] && titleFontPath="$squashfs$gamepath/title.fnt"
-    [ -f "$installpath/fonts/title.fnt" ] && titleFontPath="$installpath/fonts/title.fnt"
-    [ -f "$mountpoint/media/$modname/fonts/title.fnt" ] && titleFontPath="$mountpoint/media/$modname/fonts/title.fnt"
-    
-    # Copyright Font
-    [ -f "$squashfs$gamepath/copyright.fnt" ] && copyrightFontPath="$squashfs$gamepath/copyright.fnt"
-    [ -f "$installpath/fonts/copyright.fnt" ] && copyrightFontPath="$installpath/fonts/copyright.fnt"
-    [ -f "$mountpoint/media/$modname/fonts/copyright.fnt" ] && copyrightFontPath="$mountpoint/media/$modname/fonts/copyright.fnt"
-    
-    # Debug Font
-    [ -f "$installpath/fonts/debug.fnt" ] && debugFontPath="$installpath/fonts/debug.fnt"
-    [ -f "$mountpoint/media/$modname/fonts/debug.fnt" ] && debugFontPath="$mountpoint/media/$modname/fonts/debug.fnt"
-    
-    # Small Font
-    [ -f "$installpath/fonts/small.fnt" ] && sFontPath="$installpath/fonts/small.fnt"
-    [ -f "$mountpoint/media/$modname/fonts/small.fnt" ] && sFontPath="$mountpoint/media/$modname/fonts/small.fnt"
-    
-    # Medium Font
-    [ -f "$installpath/fonts/medium.fnt" ] && mFontPath="$installpath/fonts/medium.fnt"
-    [ -f "$mountpoint/media/$modname/fonts/medium.fnt" ] && mFontPath="$mountpoint/media/$modname/fonts/medium.fnt"
-    
-    # Large Font
-    [ -f "$installpath/fonts/large.fnt" ] && lFontPath="$installpath/fonts/large.fnt"
-    [ -f "$mountpoint/media/$modname/fonts/large.fnt" ] && lFontPath="$mountpoint/media/$modname/fonts/large.fnt"
+    local titleFontPath="$(fontFix_getPath "title")"
+    local copyrightFontPath="$(fontFix_getPath "copyright")"
+    local debugFontPath="$(fontFix_getPath "debug")"
+    local sFontPath="$(fontFix_getPath "small")"
+    local mFontPath="$(fontFix_getPath "medium")"
+    local lFontPath="$(fontFix_getPath "large")"
     
     case "$sftype" in
       nes)
@@ -132,4 +153,5 @@ fontFix(){
     fi
   fi
 }
+
 fontFix
