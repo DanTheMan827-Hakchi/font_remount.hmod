@@ -63,10 +63,10 @@ fontFix(){
     case "$sftype" in
       nes)
         # Title Font
-        [ -d "$rootfs$gamepath" ] && rsync -ac "$titleFontPath" "$rootfs$gamepath/"
+        [ -d "$rootfs$gamepath" ] && copy "$titleFontPath" "$rootfs$gamepath/"
         
         # Copyright Font
-        [ -d "$rootfs$gamepath" ] && rsync -ac "$copyrightFontPath" "$rootfs$gamepath/"
+        [ -d "$rootfs$gamepath" ] && copy "$copyrightFontPath" "$rootfs$gamepath/"
         
         # Debug Font
         [ -f "$debugFontPath" ] && fontFix_bind "$debugFontPath" "$mountpoint/usr/share/clover-ui/resources/fonts/debug.fnt"
