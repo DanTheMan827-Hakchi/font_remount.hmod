@@ -1,6 +1,6 @@
-=== Font Remount ===
+# Font Remount
 
-This module will search /media/hakchi/fonts and /var/lib/hakchi/fonts for font files with the following names
+This module will search **/media/hakchi/fonts** and **/var/lib/hakchi/fonts** for font files with the following names
 
 - title.fnt
 - copyright.fnt
@@ -13,17 +13,17 @@ It comes with an extended title.fnt by default and will use that if no other is 
 
 A description of the font files is as follows:
 
-title.fnt
+**title.fnt**  
 This is the game title font
 
-copyright.fnt
+**copyright.fnt**  
 This is used on the legal screen.
 
-small.fnt
+**small.fnt**  
 This is used for the button legend and in tooltips.
 
-medium.fnt
+**medium.fnt**  
 This is used all over the UI.
 
-large.fnt
+**large.fnt**  
 This is used for menu headings.
