@@ -143,7 +143,7 @@ repair_fonts(){
     [ -L "$1/title.fnt" ] && rm "$1/title.fnt"
     [ -L "$1/copyright.fnt" ] && rm "$1/copyright.fnt"
     
-    ln -s "$titleFontPath" "$1/title.fnt" || copy "$mountpoint$titleFontPath" "$1/"
-    ln -s "$copyrightFontPath" "$1/copyright.fnt" || copy "$mountpoint$copyrightFontPath" "$1/"
+    [ -f "$mountpoint$titleFontPath" ] && (ln -s "$titleFontPath" "$1/title.fnt" || copy "$mountpoint$titleFontPath" "$1/")
+    [ -f "$mountpoint$copyrightFontPath" ] && (ln -s "$copyrightFontPath" "$1/copyright.fnt" || copy "$mountpoint$copyrightFontPath" "$1/")
   fi
 }
