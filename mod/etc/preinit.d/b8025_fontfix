@@ -49,7 +49,6 @@ fontFix(){
 
   repair_fonts "$rootfs$gamepath"
   local font=""
-  for font in title copyright s m l; do
   fontFix0 "$ui0" "$ui1" title title
   fontFix0 "$ui0" "$ui1" copyright copyright
   fontFix0 "$ui0" "$ui1" s small
