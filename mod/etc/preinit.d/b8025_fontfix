@@ -54,7 +54,7 @@ fontFix(){
   fontFix0 "$ui0" "$ui1" s small
   fontFix0 "$ui0" "$ui1" m medium
   fontFix0 "$ui0" "$ui1" l large
-  fontFix0 "$ui0" "" "debug"
+  fontFix0 "$ui0" "" debug debug
 }
 
 repair_fonts(){
